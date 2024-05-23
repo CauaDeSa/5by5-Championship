@@ -1,5 +1,7 @@
 # MODELLING EXERCISE / DATA MAPPING / IMPLEMENTATION
 
+[Requirements Document in portuguese](https://github.com/CauaDeSa/5by5-Championship/files/15424928/campeonato_futebol.pdf).
+
 <br>
 
 In this project, students will have to individually prepare the database to control the registration of 
