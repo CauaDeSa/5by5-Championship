@@ -7,11 +7,7 @@ namespace _5by5_ChampionshipController
     {
         static void Main(string[] args)
         {
-            ChampionshipBankController cBank = new();
-            TeamBankController tBank = new();
-            GameBankController gBank = new();
-            GameBankController hBank = new();
-            GameBankController mBank = new();
+            
         }
     }
 }

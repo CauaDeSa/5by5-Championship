@@ -1,6 +1,6 @@
 ﻿namespace _5by5_ChampionshipController.Entity
 {
-    internal class Stats
+    public class Stats
     {
         public string Tname { get; set; }
         public string Cname { get; set; }

@@ -7,71 +7,58 @@ namespace _5by5_ChampionshipController.Bank
     {
         public TeamBankController() : base () { }
 
-        public override void Insert(Team team)
+        public override bool Insert(Team team)
         {
-            sqlCommand.CommandText = "INSERT INTO Team(name, nickname, creationDate, pontuation, scoredGoals, sufferedGoals) VALUES (@name, @nickname, @creationDate, @pontuation, @scoredGoals, @sufferedGoals);";
+            sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = team.Name;
+            sqlCommand.Parameters.AddWithValue("@nickname", System.Data.SqlDbType.VarChar).Value = team.Nickname;
+            sqlCommand.Parameters.AddWithValue("@creationDate", System.Data.SqlDbType.Date).Value = team.CreationDate;
 
-            SqlParameter name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter nickname = new("@nickname", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter creationDate = new("@creationDate", System.Data.SqlDbType.Date);
-
-            name.Value = team.Name;
-            nickname.Value = team.Nickname;
-            creationDate.Value = team.CreationDate;
-
-            sqlCommand.Parameters.Add(name);
-            sqlCommand.Parameters.Add(nickname);
-            sqlCommand.Parameters.Add(creationDate);
-
-            Query();
+            return BooleanQuery("spCreateTeam");
         }
 
-        public override Team GetByName(string name)
+        public Team? GetByName(string name)
         {
-            sqlCommand.CommandText = "SELECT * FROM Team WHERE name = @name;";
+            sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = name;
 
-            SqlParameter Name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            Name.Value = name;
-
-            sqlCommand.Parameters.Add(Name);
-
-            using SqlDataReader reader = sqlCommand.ExecuteReader();
-            {
-                reader.Read();
-                return new Team(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()));
-            }
+            using SqlDataReader reader = ReadableQuery("spRetrieveTeam");
+                if (reader.Read())
+                    return new Team(name, reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()));
+            
+            return null;
         }
 
         public override List<Team> GetAll()
         {
-            sqlCommand.CommandText = "SELECT * FROM Team;";
-
             List<Team> list = new();
 
-            using SqlDataReader reader = sqlCommand.ExecuteReader();
+            using SqlDataReader reader = ReadableQuery("spRetrieveAllTeams");
                 while (reader.Read()) 
                     list.Add(new Team(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString())));
 
             return list;
         }
 
-        public override void RemoveByName(string name)
+        public bool UpdateTeam(string name, string nickname, DateOnly creationDate)
         {
-            sqlCommand.CommandText = "DELETE FROM Team WHERE name = @name;";
+            sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = name;
+            sqlCommand.Parameters.AddWithValue("@nickname", System.Data.SqlDbType.VarChar).Value = nickname;
+            sqlCommand.Parameters.AddWithValue("@creationDate", System.Data.SqlDbType.Date).Value = creationDate;
 
-            SqlParameter Name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            Name.Value = name;
-
-            sqlCommand.Parameters.Add(Name);
-
-            Query();
+            return BooleanQuery("spUpdateTeam");
         }
 
-        public override void RemoveAll()
+        public bool RemoveByName(string name)
         {
-            sqlCommand.CommandText = "DELETE FROM Team;";
+            sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = name;
 
-            Query();
+            return BooleanQuery("spDeleteTeam");
+        }
+
+        public bool ChangeActivityStatus(string teamName)
+        {
+            sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = teamName;
+
+            return BooleanQuery("spChangeSituation");
         }
     }
 }
