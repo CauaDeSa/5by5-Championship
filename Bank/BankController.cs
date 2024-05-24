@@ -15,19 +15,40 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand = new();
         }
 
-        protected void Query()
+        protected bool BooleanQuery(string sp)
         {
+            sqlCommand.CommandText = sp;
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
             sqlConnection.Open();
-            sqlCommand.ExecuteNonQuery();
+            Object result = sqlCommand.ExecuteScalar();
             sqlConnection.Close();
 
+            sqlCommand.Parameters.Clear();
             sqlCommand.Connection = sqlConnection;
+
+            return (int)result == 1;
         }
 
-        public abstract void Insert(T obj);
+        protected SqlDataReader ReadableQuery(string sp)
+        {
+            sqlCommand.CommandText = sp;
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
+            sqlCommand.Parameters.Add(new SqlParameter("@result", System.Data.SqlDbType.Int) { Direction = System.Data.ParameterDirection.Output });
+
+            sqlConnection.Open();
+            SqlDataReader dr = sqlCommand.ExecuteReader();
+            sqlConnection.Close();
+
+            sqlCommand.Parameters.Clear();
+            sqlCommand.Connection = sqlConnection;
+
+            return dr;
+        }
+
+        public abstract bool Insert(T obj);
 
         public abstract List<T> GetAll();
-
-        public abstract void RemoveAll();
     }
 }

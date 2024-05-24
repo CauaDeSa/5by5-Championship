@@ -1,6 +1,6 @@
 ﻿namespace _5by5_ChampionshipController.Entity
 {
-    internal class Game
+    public class Game
     {
         public string Championship { get; set; }
         public string Season { get; set; }

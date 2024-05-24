@@ -1,5 +1,6 @@
 ﻿using _5by5_ChampionshipController.Entity;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace _5by5_ChampionshipController.Bank
 {
@@ -7,98 +8,59 @@ namespace _5by5_ChampionshipController.Bank
     {
         public ChampionshipBankController() : base() { }
 
-        public override void Insert(Championship championship)
+        public override bool Insert(Championship championship)
         {
-            sqlCommand.CommandText = "INSERT INTO Championship(name, season, startDate, endDate) VALUES (@name, @season, @startDate, @endDate);";
+            sqlCommand.Parameters.AddWithValue("@championshipName", SqlDbType.VarChar).Value = championship.Name;
+            sqlCommand.Parameters.AddWithValue("@season", SqlDbType.VarChar).Value = championship.Season;
+            sqlCommand.Parameters.AddWithValue("@startDate", SqlDbType.Date).Value = championship.StartDate;
+            sqlCommand.Parameters.AddWithValue("@endDate", SqlDbType.Date).Value = championship.EndDate;
 
-            SqlParameter name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter season = new("@season", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter startDate = new("@startDate", System.Data.SqlDbType.Date);
-            SqlParameter endDate = new("@endDate", System.Data.SqlDbType.Date);
-
-            name.Value = championship.Name;
-            season.Value = championship.Season;
-            startDate.Value = championship.StartDate;
-            endDate.Value = championship.EndDate;
-
-            sqlCommand.Parameters.Add(name);
-            sqlCommand.Parameters.Add(season);
-            sqlCommand.Parameters.Add(startDate);
-            sqlCommand.Parameters.Add(endDate);
-
-            Query();
-        }
-        
-        public void SetEndDate(string name, string season, DateOnly endDate)
-        {
-            sqlCommand.CommandText = "UPDATE Championship SET endDate = @endDate WHERE name = @name AND season = @season;";
-
-            SqlParameter Name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter Season = new("@season", System.Data.SqlDbType.VarChar, 7);
-            SqlParameter EndDate = new("@endDate", System.Data.SqlDbType.Date);
-
-            Name.Value = name;
-            Season.Value = season;
-            EndDate.Value = endDate;
-
-            sqlCommand.Parameters.Add(Name);
-            sqlCommand.Parameters.Add(Season);
-            sqlCommand.Parameters.Add(EndDate);
-
-            Query();
+            return BooleanQuery("spCreateNewChampionship");
         }
 
-        public Championship GetByNameAndSeason(string name, string season)
+        public bool SetEndDate(string championshipName, string cSeason) => SetEndDate(championshipName, cSeason, DateOnly.FromDateTime(DateTime.Now));
+
+        public bool SetEndDate(string championshipName, string cSeason, DateOnly date)
         {
-            sqlCommand.CommandText = "SELECT * FROM Championship WHERE name = @name AND season = @season;";
-            SqlParameter Name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter Season = new("@season", System.Data.SqlDbType.VarChar, 7);
-            
-            Name.Value = name;
-            Season.Value = season;
+            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = cSeason;
+            sqlCommand.Parameters.AddWithValue("@endDate", System.Data.SqlDbType.Date).Value = date;
 
-            sqlCommand.Parameters.Add(Name);
-            sqlCommand.Parameters.Add(Season);
+            return BooleanQuery("spEndChampionship");
+        }
 
-            using SqlDataReader reader = sqlCommand.ExecuteReader();
-            {
-                reader.Read();
-                return new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString()));
-            }
+        public Championship? GetByNameAndSeason(string championshipName, string season)
+        {
+            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
+
+            using SqlDataReader reader = ReadableQuery("spRetrieveChampionship");
+                if (reader.Read())
+                    return new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString()));
+
+            return null;
         }
 
         public override List<Championship> GetAll()
         {
             List<Championship> championships = new();
-            sqlCommand.CommandText = "SELECT * FROM Championship;";
 
-            using SqlDataReader reader = sqlCommand.ExecuteReader();
+            using SqlDataReader reader = ReadableQuery("spRetrieveAllChampionships");
                 while (reader.Read())
                     championships.Add(new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString())));
 
             return championships;
         }
 
-        public void RemoveByNameAndSeason(string name, string season)
+        public bool EndByNameAndSeason(string championshipName, string season) => EndByNameAndSeason(championshipName, season, DateOnly.FromDateTime(DateTime.Now));
+
+        public bool EndByNameAndSeason(string championshipName, string season, DateOnly end)
         {
-            sqlCommand.CommandText = "DELETE FROM Championship WHERE name = @name AND season = @season;";
-            SqlParameter Name = new("@name", System.Data.SqlDbType.VarChar, 30);
-            SqlParameter Season = new("@season", System.Data.SqlDbType.VarChar, 7);
+            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
+            sqlCommand.Parameters.AddWithValue("@endDate", System.Data.SqlDbType.Date).Value = end;
 
-            Name.Value = name;
-            Season.Value = season;
-
-            sqlCommand.Parameters.Add(Name);
-            sqlCommand.Parameters.Add(Season);
-
-            Query();
-        }
-
-        public override void RemoveAll()
-        {
-            sqlCommand.CommandText = "DELETE FROM Championship;";
-
-            Query();
+            return BooleanQuery("spEndChampionship");
         }
     }
 }
