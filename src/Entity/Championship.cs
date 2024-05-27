@@ -1,4 +1,4 @@
-﻿namespace _5by5_ChampionshipController.Entity
+﻿namespace _5by5_ChampionshipController.src.Entity
 {
     public class Championship
     {
@@ -11,16 +11,16 @@
         {
             Name = name;
             Season = season;
-            this.StartDate = startDate;
-            this.EndDate = null;
+            StartDate = startDate;
+            EndDate = null;
         }
 
         public Championship(string name, string season, DateOnly startDate, DateOnly endDate)
         {
             Name = name;
             Season = season;
-            this.StartDate = startDate;
-            this.EndDate = endDate;
+            StartDate = startDate;
+            EndDate = endDate;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace _5by5_ChampionshipController.Entity
+﻿namespace _5by5_ChampionshipController.src.Entity
 {
     public class Team
     {

@@ -1,7 +1,7 @@
 ﻿using _5by5_ChampionshipController.Entity;
 using Microsoft.Data.SqlClient;
 
-namespace _5by5_ChampionshipController.Bank
+namespace _5by5_ChampionshipController.src.Bank
 {
     public abstract class BankController<T>
     {
@@ -21,7 +21,7 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
 
             sqlConnection.Open();
-            Object result = sqlCommand.ExecuteScalar();
+            object result = sqlCommand.ExecuteScalar();
             sqlConnection.Close();
 
             sqlCommand.Parameters.Clear();

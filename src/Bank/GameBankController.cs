@@ -1,7 +1,7 @@
-﻿using _5by5_ChampionshipController.Entity;
+﻿using _5by5_ChampionshipController.src.Entity;
 using Microsoft.Data.SqlClient;
 
-namespace _5by5_ChampionshipController.Bank
+namespace _5by5_ChampionshipController.src.Bank
 {
     public class GameBankController : BankController<Game>
     {
@@ -39,9 +39,9 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.Parameters.AddWithValue("@visitor", System.Data.SqlDbType.VarChar).Value = visitor;
 
             using SqlDataReader reader = ReadableQuery("spRetrieveGame");
-                if (reader.Read())
-                    return new Game(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetInt32(5));
-            
+            if (reader.Read())
+                return new Game(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetInt32(5));
+
             return null;
         }
 
@@ -50,8 +50,8 @@ namespace _5by5_ChampionshipController.Bank
             List<Game> list = new();
 
             using SqlDataReader reader = ReadableQuery("spRetrieveAllGames");
-                while (reader.Read())
-                    list.Add(new Game(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetInt32(5)));
+            while (reader.Read())
+                list.Add(new Game(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetInt32(5)));
 
             return list;
         }

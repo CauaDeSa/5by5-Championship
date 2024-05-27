@@ -1,11 +1,11 @@
-﻿using _5by5_ChampionshipController.Entity;
+﻿using _5by5_ChampionshipController.src.Entity;
 using Microsoft.Data.SqlClient;
 
-namespace _5by5_ChampionshipController.Bank
+namespace _5by5_ChampionshipController.src.Bank
 {
     internal class TeamBankController : BankController<Team>
     {
-        public TeamBankController() : base () { }
+        public TeamBankController() : base() { }
 
         public override bool Insert(Team team)
         {
@@ -21,9 +21,9 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = name;
 
             using SqlDataReader reader = ReadableQuery("spRetrieveTeam");
-                if (reader.Read())
-                    return new Team(name, reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()));
-            
+            if (reader.Read())
+                return new Team(name, reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()));
+
             return null;
         }
 
@@ -32,8 +32,8 @@ namespace _5by5_ChampionshipController.Bank
             List<Team> list = new();
 
             using SqlDataReader reader = ReadableQuery("spRetrieveAllTeams");
-                while (reader.Read()) 
-                    list.Add(new Team(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString())));
+            while (reader.Read())
+                list.Add(new Team(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString())));
 
             return list;
         }

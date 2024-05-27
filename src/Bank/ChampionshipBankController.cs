@@ -1,8 +1,8 @@
-﻿using _5by5_ChampionshipController.Entity;
+﻿using _5by5_ChampionshipController.src.Entity;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace _5by5_ChampionshipController.Bank
+namespace _5by5_ChampionshipController.src.Bank
 {
     public class ChampionshipBankController : BankController<Championship>
     {
@@ -22,21 +22,21 @@ namespace _5by5_ChampionshipController.Bank
 
         public bool SetEndDate(string championshipName, string cSeason, DateOnly date)
         {
-            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
-            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = cSeason;
-            sqlCommand.Parameters.AddWithValue("@endDate", System.Data.SqlDbType.Date).Value = date;
+            sqlCommand.Parameters.AddWithValue("@championshipName", SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", SqlDbType.VarChar).Value = cSeason;
+            sqlCommand.Parameters.AddWithValue("@endDate", SqlDbType.Date).Value = date;
 
             return BooleanQuery("spEndChampionship");
         }
 
         public Championship? GetByNameAndSeason(string championshipName, string season)
         {
-            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
-            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
+            sqlCommand.Parameters.AddWithValue("@championshipName", SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", SqlDbType.VarChar).Value = season;
 
             using SqlDataReader reader = ReadableQuery("spRetrieveChampionship");
-                if (reader.Read())
-                    return new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString()));
+            if (reader.Read())
+                return new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString()));
 
             return null;
         }
@@ -46,8 +46,8 @@ namespace _5by5_ChampionshipController.Bank
             List<Championship> championships = new();
 
             using SqlDataReader reader = ReadableQuery("spRetrieveAllChampionships");
-                while (reader.Read())
-                    championships.Add(new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString())));
+            while (reader.Read())
+                championships.Add(new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString())));
 
             return championships;
         }
@@ -56,9 +56,9 @@ namespace _5by5_ChampionshipController.Bank
 
         public bool EndByNameAndSeason(string championshipName, string season, DateOnly end)
         {
-            sqlCommand.Parameters.AddWithValue("@championshipName", System.Data.SqlDbType.VarChar).Value = championshipName;
-            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
-            sqlCommand.Parameters.AddWithValue("@endDate", System.Data.SqlDbType.Date).Value = end;
+            sqlCommand.Parameters.AddWithValue("@championshipName", SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", SqlDbType.VarChar).Value = season;
+            sqlCommand.Parameters.AddWithValue("@endDate", SqlDbType.Date).Value = end;
 
             return BooleanQuery("spEndChampionship");
         }

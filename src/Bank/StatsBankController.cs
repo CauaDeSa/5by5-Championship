@@ -1,7 +1,7 @@
-﻿using _5by5_ChampionshipController.Entity;
+﻿using _5by5_ChampionshipController.src.Entity;
 using Microsoft.Data.SqlClient;
 
-namespace _5by5_ChampionshipController.Bank
+namespace _5by5_ChampionshipController.src.Bank
 {
     internal class StatsBankController : BankController<Stats>
     {
@@ -15,10 +15,10 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.Parameters.AddWithValue("@pontuation", System.Data.SqlDbType.Int).Value = stats.Pontuation;
             sqlCommand.Parameters.AddWithValue("@scoredGoals", System.Data.SqlDbType.Int).Value = stats.ScoredGoals;
             sqlCommand.Parameters.AddWithValue("@sufferedGoals", System.Data.SqlDbType.Int).Value = stats.SufferedGoals;
-            
+
             return BooleanQuery("spCreateStats");
         }
-        
+
         public Stats? RetrieveStatsFromTeamAndChampionship(string teamName, string championshipName, string season)
         {
             sqlCommand.Parameters.AddWithValue("@teamName", System.Data.SqlDbType.VarChar).Value = teamName;
@@ -26,9 +26,9 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
 
             using SqlDataReader reader = ReadableQuery("spRetrieveStats");
-                if (reader.Read())
-                    return new Stats(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(5));
-            
+            if (reader.Read())
+                return new Stats(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(5));
+
             return null;
         }
 
@@ -50,7 +50,7 @@ namespace _5by5_ChampionshipController.Bank
             sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
 
             return BooleanQuery("spUpdateTeamStats");
-        }   
+        }
 
         public bool DeleteStatsFromTeamAndChampionship(string teamName, string championshipName, string season)
         {
