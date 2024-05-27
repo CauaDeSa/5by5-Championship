@@ -14,5 +14,13 @@
             CreationDate = creationDate;
             isActive = true;
         }
+
+        public override string ToString()
+        {
+            return $@"
+               Team.......... {Name}
+               Nickname...... {Nickname}
+               CreationDate.. {CreationDate}";
+        }
     }
 }

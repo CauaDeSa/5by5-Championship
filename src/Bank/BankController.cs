@@ -1,4 +1,4 @@
-﻿using _5by5_ChampionshipController.Entity;
+﻿using _5by5_ChampionshipController.src;
 using Microsoft.Data.SqlClient;
 
 namespace _5by5_ChampionshipController.src.Bank
@@ -19,13 +19,13 @@ namespace _5by5_ChampionshipController.src.Bank
         {
             sqlCommand.CommandText = sp;
             sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            sqlCommand.Connection = sqlConnection;
 
             sqlConnection.Open();
             object result = sqlCommand.ExecuteScalar();
             sqlConnection.Close();
 
             sqlCommand.Parameters.Clear();
-            sqlCommand.Connection = sqlConnection;
 
             return (int)result == 1;
         }
@@ -34,15 +34,14 @@ namespace _5by5_ChampionshipController.src.Bank
         {
             sqlCommand.CommandText = sp;
             sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-
-            sqlCommand.Parameters.Add(new SqlParameter("@result", System.Data.SqlDbType.Int) { Direction = System.Data.ParameterDirection.Output });
+            sqlCommand.Connection = sqlConnection;
+            //sqlCommand.Parameters.Add(new SqlParameter("@result", System.Data.SqlDbType.Int) { Direction = System.Data.ParameterDirection.Output });
 
             sqlConnection.Open();
             SqlDataReader dr = sqlCommand.ExecuteReader();
             sqlConnection.Close();
 
             sqlCommand.Parameters.Clear();
-            sqlCommand.Connection = sqlConnection;
 
             return dr;
         }

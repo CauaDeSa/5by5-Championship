@@ -31,25 +31,54 @@ namespace _5by5_ChampionshipController.src.Bank
 
         public Championship? GetByNameAndSeason(string championshipName, string season)
         {
+            sqlCommand.CommandText = "spRetrieveChampionship";
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
             sqlCommand.Parameters.AddWithValue("@championshipName", SqlDbType.VarChar).Value = championshipName;
             sqlCommand.Parameters.AddWithValue("@season", SqlDbType.VarChar).Value = season;
 
-            using SqlDataReader reader = ReadableQuery("spRetrieveChampionship");
+            sqlCommand.Connection = sqlConnection;
+
+            sqlConnection.Open();
+
+            using SqlDataReader reader = sqlCommand.ExecuteReader();
             if (reader.Read())
                 return new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString()));
+
+            sqlCommand.Parameters.Clear();
+            sqlConnection.Close();
 
             return null;
         }
 
         public override List<Championship> GetAll()
         {
-            List<Championship> championships = new();
+            List<Championship> list = new();
 
-            using SqlDataReader reader = ReadableQuery("spRetrieveAllChampionships");
+            sqlCommand.CommandText = "spRetrieveAllChampionships";
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            sqlCommand.Connection = sqlConnection;
+
+            sqlConnection.Open();
+
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+
             while (reader.Read())
-                championships.Add(new(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString()), DateOnly.Parse(reader.GetDateTime(3).ToString())));
+            {
+                Championship aux = new(reader.GetString(0), reader.GetString(1), DateOnly.FromDateTime(reader.GetDateTime(2)));
 
-            return championships;
+                if (!reader.IsDBNull(3))
+                    aux.EndDate = DateOnly.FromDateTime(reader.GetDateTime(3));
+                else
+                    aux.EndDate = null;
+
+                list.Add(aux);
+            }
+            
+            sqlCommand.Parameters.Clear();
+            sqlConnection.Close();
+
+            return list;
         }
 
         public bool EndByNameAndSeason(string championshipName, string season) => EndByNameAndSeason(championshipName, season, DateOnly.FromDateTime(DateTime.Now));

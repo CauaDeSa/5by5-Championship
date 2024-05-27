@@ -12,4 +12,10 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\Modules\Championship\" />
+    <Folder Include="src\Modules\Game\" />
+    <Folder Include="src\Modules\Team\" />
+  </ItemGroup>
+
 </Project>

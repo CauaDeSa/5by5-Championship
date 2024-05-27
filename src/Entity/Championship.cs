@@ -22,5 +22,14 @@
             StartDate = startDate;
             EndDate = endDate;
         }
+
+        public override string ToString()
+        {
+            return $@"
+               Championship........... {Name}
+               Season................. {Season}
+               StartDate.............. {StartDate}
+               EndDate................ {(EndDate == null ? "Not ended yet" : EndDate)}";
+        }
     }
 }

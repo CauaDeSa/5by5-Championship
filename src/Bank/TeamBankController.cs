@@ -16,7 +16,7 @@ namespace _5by5_ChampionshipController.src.Bank
             return BooleanQuery("spCreateTeam");
         }
 
-        public Team? GetByName(string name)
+        public Team? RetrieveByName(string name)
         {
             sqlCommand.Parameters.AddWithValue("@name", System.Data.SqlDbType.VarChar).Value = name;
 
@@ -31,9 +31,19 @@ namespace _5by5_ChampionshipController.src.Bank
         {
             List<Team> list = new();
 
-            using SqlDataReader reader = ReadableQuery("spRetrieveAllTeams");
+            sqlCommand.CommandText = "spRetrieveAllTeams";
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            sqlCommand.Connection = sqlConnection;
+
+            sqlConnection.Open();
+
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+
             while (reader.Read())
-                list.Add(new Team(reader.GetString(0), reader.GetString(1), DateOnly.Parse(reader.GetDateTime(2).ToString())));
+                list.Add(new Team(reader.GetString(0), reader.GetString(1), DateOnly.FromDateTime(reader.GetDateTime(2))));
+
+            sqlCommand.Parameters.Clear();
+            sqlConnection.Close();
 
             return list;
         }

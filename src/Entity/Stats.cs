@@ -28,5 +28,16 @@
             ScoredGoals = scoredGoals;
             SufferedGoals = sufferedGoals;
         }
+
+        public override string ToString()
+        {
+            return $@"
+                Team.......... {Tname}
+                Championship.. {Cname}
+                Season........ {Season}
+                Pontuation.... {Pontuation}
+                ScoredGoals... {ScoredGoals}
+                SufferedGoals. {SufferedGoals}";
+        }
     }
 }

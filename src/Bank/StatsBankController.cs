@@ -32,6 +32,31 @@ namespace _5by5_ChampionshipController.src.Bank
             return null;
         }
 
+        public List<Stats>? RetrieveByChampionshipAndSeason(string championshipName, string season)
+        {
+            List<Stats> list = new();
+
+            sqlCommand.CommandText = "spRetrieveByChampionshipAndSeason";
+            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
+            sqlCommand.Parameters.AddWithValue("@championship", System.Data.SqlDbType.VarChar).Value = championshipName;
+            sqlCommand.Parameters.AddWithValue("@season", System.Data.SqlDbType.VarChar).Value = season;
+
+            sqlCommand.Connection = sqlConnection;
+
+            sqlConnection.Open();
+
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+
+            while (reader.Read())
+                list.Add(new Stats(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(5)));
+
+            sqlCommand.Parameters.Clear();
+            sqlConnection.Close();
+
+            return list;
+        }
+
         public override List<Stats> GetAll()
         {
             List<Stats> list = new();

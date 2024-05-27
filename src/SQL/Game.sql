@@ -8,6 +8,7 @@ CREATE TABLE Game
 	home varchar(3),
 	homeGoals int null,
 	visitorGoals int null,
+    isFinished bit default 0,
 	CONSTRAINT fkGame_Championship FOREIGN KEY (championship, season) REFERENCES Championship(name, season),
 	CONSTRAINT fkGame_Visitor FOREIGN KEY (visitor) REFERENCES Team(nickname),
 	CONSTRAINT fkGame_Home FOREIGN KEY (home) REFERENCES Team(nickname)
@@ -26,7 +27,6 @@ AS
 BEGIN
     IF EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home) RETURN 0;
     IF (SELECT COUNT(*) FROM Stats WHERE championshipName = @championship AND season = @season) > 4 RETURN 0;
-    --verrify if teams is active
     IF (SELECT isActive FROM Team WHERE nickname = @visitor OR nickname = @home) = 0 RETURN 0;
 
 
