@@ -78,3 +78,9 @@ What will my bank/app have to show me?
    <br><br>
    
    <img src="https://github.com/CauaDeSa/5by5-Championship/assets/127906505/b767be5a-b323-4580-bff8-0b6442706207" width="750px">
+
+   <br>
+
+   ## Simply Fluxogram
+
+   <img src="https://github.com/CauaDeSa/5by5-Championship/assets/127906505/34395fed-aa20-4072-94e2-e597316ed5a2" width="750px">
