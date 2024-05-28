@@ -11,16 +11,47 @@ CREATE TABLE Championship
 
 GO
 
-CREATE PROCEDURE spCreateNewChampionship
+CREATE PROCEDURE spInitializeChampionship
+AS
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Championship' AND xtype='U')
+    BEGIN
+        CREATE TABLE Championship
+        (
+            name varchar(30),
+            season varchar(7),
+            startDate Date not null,
+            endDate Date null
+            CONSTRAINT pkChampionship primary key (name, season)
+        );
+    END
+END
+
+GO
+
+CREATE PROCEDURE spHasChampionship
+    @bool int OUTPUT,
+    @name varchar(30),
+    @season varchar(7)
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM Championship WHERE name = @name AND season = @season) SET @bool = 1;
+    ELSE SET @bool = 0;
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE spCreateNewChampionship
+    @bool int OUTPUT,
     @name varchar(30),
     @season varchar(7),
     @startDate Date
 AS
 BEGIN
-    IF EXISTS (SELECT * FROM Championship WHERE name = @name AND season = @season) RETURN 0;
+    IF EXISTS (SELECT * FROM Championship WHERE name = @name AND season = @season) SET @bool = 0;
 
-    INSERT INTO Championship (name, season, startDate) VALUES (@name, @season, @startDate)
-    RETURN 1;
+    ELSE INSERT INTO Championship (name, season, startDate) VALUES (@name, @season, @startDate)
+    SET @bool = 1;
 END
 
 GO
@@ -45,24 +76,19 @@ END
 
 GO
 
-CREATE PROCEDURE spEndChampionship
+CREATE OR ALTER PROCEDURE spEndChampionship
+    @bool int OUTPUT,
     @name varchar(30),
     @season varchar(7),
     @endDate Date
 AS
 BEGIN
-    Declare @Tcount int,
-            @Gcount int;
-
-    SET @Tcount = (SELECT COUNT(*) FROM Stats WHERE championshipName = @name AND season = @season);
-    SET @Gcount = (SELECT COUNT(*) FROM Game WHERE championship = @name AND season = @season);
-
-    IF @Tcount > @Gcount RETURN 0;
-
     UPDATE Championship
     SET endDate = @endDate
     WHERE name = @name AND season = @season
-    RETURN 1;
+
+    SET @bool = 1
+    RETURN;
 END
 
 GO

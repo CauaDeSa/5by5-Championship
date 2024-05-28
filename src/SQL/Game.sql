@@ -8,7 +8,6 @@ CREATE TABLE Game
 	home varchar(3),
 	homeGoals int null,
 	visitorGoals int null,
-    isFinished bit default 0,
 	CONSTRAINT fkGame_Championship FOREIGN KEY (championship, season) REFERENCES Championship(name, season),
 	CONSTRAINT fkGame_Visitor FOREIGN KEY (visitor) REFERENCES Team(nickname),
 	CONSTRAINT fkGame_Home FOREIGN KEY (home) REFERENCES Team(nickname)
@@ -16,23 +15,48 @@ CREATE TABLE Game
 
 GO
 
-CREATE PROCEDURE spCreateGame 
+CREATE PROCEDURE spInitializeGame
+AS
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Game' AND xtype='U')
+    BEGIN
+        CREATE TABLE Game 
+        (
+            championship varchar(30),
+            season varchar(7),
+            visitor varchar(3),
+            home varchar(3),
+            homeGoals int null,
+            visitorGoals int null,
+            CONSTRAINT fkGame_Championship FOREIGN KEY (championship, season) REFERENCES Championship(name, season),
+            CONSTRAINT fkGame_Visitor FOREIGN KEY (visitor) REFERENCES Team(nickname),
+            CONSTRAINT fkGame_Home FOREIGN KEY (home) REFERENCES Team(nickname)
+        );
+    END
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE spCreateGame 
     @championship varchar(30),
     @season varchar(7),
     @visitor varchar(3),
     @home varchar(3),
     @homeGoals int,
-    @visitorGoals int
+    @visitorGoals int,
+    @bool int OUTPUT
 AS
 BEGIN
-    IF EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home) RETURN 0;
-    IF (SELECT COUNT(*) FROM Stats WHERE championshipName = @championship AND season = @season) > 4 RETURN 0;
-    IF (SELECT isActive FROM Team WHERE nickname = @visitor OR nickname = @home) = 0 RETURN 0;
-
+    IF EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home)
+    BEGIN
+        SET @bool = 0;
+        RETURN;
+    END
 
     INSERT INTO Game (championship, season, visitor, home, homeGoals, visitorGoals)
     VALUES (@championship, @season, @visitor, @home, @homeGoals, @visitorGoals)
-    RETURN 1;
+    SET @bool = 1;
+    RETURN;
 END
 
 GO 
@@ -47,52 +71,6 @@ BEGIN
     IF NOT EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home) RETURN 0;
 
     SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home
-END
-
-GO
-
-CREATE PROCEDURE spRetrieveAllGames
-AS
-BEGIN
-    SELECT * FROM Game
-END
-
-GO
-
-CREATE PROCEDURE spUpdateGoals
-    @championship varchar(30),
-    @season varchar(7),
-    @visitor varchar(3),
-    @home varchar(3),
-    @homeGoals int,
-    @visitorGoals int
-AS
-BEGIN
-    IF NOT EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home)
-    EXEC spCreateGame @championship, @season, @visitor, @home, @homeGoals, @visitorGoals;
-
-    IF @homeGoals = 0 SET @homeGoals = 0;
-    IF @visitorGoals = 0 SET @visitorGoals = 0;
-
-    UPDATE Game
-    SET homeGoals = @homeGoals, visitorGoals = @visitorGoals
-    WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home
-END
-
-GO
-
-CREATE PROCEDURE spDeleteGame
-    @championship varchar(30),
-    @season varchar(7),
-    @visitor varchar(3),
-    @home varchar(3)
-AS
-BEGIN
-    IF NOT EXISTS (SELECT * FROM Game WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home) RETURN 0;
-
-    DELETE FROM Game
-    WHERE championship = @championship AND season = @season AND visitor = @visitor AND home = @home
-    RETURN 1;
 END
 
 GO
